@@ -45,6 +45,7 @@
   // ════════════════════════════════════════════
 
   $('#btn-create').addEventListener('click', () => {
+    narrator.unlockAudio();
     const hostName = ($('#input-host-name')?.value || '').trim();
     if (!hostName) {
       showError('Please enter your name');
@@ -61,6 +62,7 @@
   });
 
   $('#btn-test-bots').addEventListener('click', () => {
+    narrator.unlockAudio();
     const hostName = ($('#input-host-name')?.value || 'You').trim();
     hideError();
     isHost = true;

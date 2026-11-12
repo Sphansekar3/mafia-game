@@ -5,9 +5,23 @@
 
 const narrator = (() => {
   let audioEl = null;
+  let isUnlocked = false;
 
   function init() {
     audioEl = new Audio();
+  }
+
+  // Mobile browsers require audio to be unlocked via a user tap/click
+  function unlockAudio() {
+    if (isUnlocked) return;
+    if (!audioEl) audioEl = new Audio();
+    // Play a tiny silent audio or prime the element
+    audioEl.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+    audioEl.play().then(() => {
+      isUnlocked = true;
+      audioEl.pause();
+      audioEl.currentTime = 0;
+    }).catch(() => {});
   }
 
   /**
@@ -55,5 +69,5 @@ const narrator = (() => {
     }
   }
 
-  return { init, speak };
+  return { init, unlockAudio, speak };
 })();
