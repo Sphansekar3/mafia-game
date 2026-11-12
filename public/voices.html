@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mafia Voice Audition</title>
+  <style>
+    body {
+      background: #0d0d0d;
+      color: #eee;
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+    h1 { color: #e74c3c; margin-bottom: 6px; }
+    p.sub { color: #888; margin-bottom: 30px; text-align: center; max-width: 500px; }
+    .card {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 18px 24px;
+      margin-bottom: 16px;
+      width: 100%;
+      max-width: 540px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .card:hover { border-color: #e74c3c; }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .name { font-weight: bold; font-size: 1.1rem; color: #fff; }
+    .tag { font-size: 0.8rem; padding: 2px 8px; background: #2c3e50; border-radius: 4px; color: #3498db; }
+    .desc { font-size: 0.9rem; color: #aaa; }
+    audio { width: 100%; height: 38px; outline: none; }
+    .back { margin-top: 30px; color: #e74c3c; text-decoration: none; font-size: 0.95rem; }
+    .back:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <h1>🎭 Narrator Voice Audition</h1>
+  <p class="sub">Listen to these 4 studio-quality neural voices reading the game narration: <em>"Night falls over the town. Everyone, close your eyes and sleep."</em></p>
+
+  <!-- Christopher -->
+  <div class="card">
+    <div class="header">
+      <span class="name">1. Christopher</span>
+      <span class="tag">Top Pick</span>
+    </div>
+    <div class="desc">Deep, authoritative, cinematic thriller narrator tone.</div>
+    <audio controls src="/voices/en-US-ChristopherNeural/audio.mp3"></audio>
+  </div>
+
+  <!-- Guy -->
+  <div class="card">
+    <div class="header">
+      <span class="name">2. Guy</span>
+      <span class="tag">Natural US</span>
+    </div>
+    <div class="desc">Warm, natural, clear American documentary storyteller.</div>
+    <audio controls src="/voices/en-US-GuyNeural/audio.mp3"></audio>
+  </div>
+
+  <!-- Brian -->
+  <div class="card">
+    <div class="header">
+      <span class="name">3. Brian</span>
+      <span class="tag">Dark & Grave</span>
+    </div>
+    <div class="desc">Lower register, mysterious, serious movie trailer vibe.</div>
+    <audio controls src="/voices/en-US-BrianNeural/audio.mp3"></audio>
+  </div>
+
+  <!-- Ryan -->
+  <div class="card">
+    <div class="header">
+      <span class="name">4. Ryan</span>
+      <span class="tag">British Classic</span>
+    </div>
+    <div class="desc">Sophisticated, dramatic British mystery narrator.</div>
+    <audio controls src="/voices/en-GB-RyanNeural/audio.mp3"></audio>
+  </div>
+
+  <a href="/" class="back">← Back to Mafia Lobby</a>
+
+</body>
+</html>

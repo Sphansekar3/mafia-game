@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>MAFIA</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ====== HOME SCREEN ====== -->
+  <section id="screen-home" class="screen active">
+    <div class="screen-content">
+      <h1 class="game-title">🔪 MAFIA</h1>
+      <p class="subtitle">A game of deception</p>
+
+      <div class="home-panels">
+        <!-- Create Room -->
+        <div class="panel" id="panel-create">
+          <h2>Create Room</h2>
+          <label for="input-host-name">Your Name</label>
+          <input type="text" id="input-host-name" maxlength="16" placeholder="Host's name" autocomplete="off">
+          <label for="input-player-count">Number of Players</label>
+          <input type="number" id="input-player-count" min="5" max="12" value="6" placeholder="5–12">
+
+          <button id="btn-create" class="btn btn-primary">Create Room</button>
+          
+          <div style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed #444;">
+            <button id="btn-test-bots" class="btn btn-secondary" style="background: #27ae60; font-size: 0.9rem;">🤖 Solo Test (Play as Mafia + 4 Bots)</button>
+          </div>
+        </div>
+
+        <div class="divider"><span>OR</span></div>
+
+        <!-- Join Room -->
+        <div class="panel" id="panel-join">
+          <h2>Join Room</h2>
+          <label for="input-room-code">Room Code</label>
+          <input type="text" id="input-room-code" maxlength="6" placeholder="e.g. ABCD" autocapitalize="characters" autocomplete="off">
+          <label for="input-player-name">Your Name</label>
+          <input type="text" id="input-player-name" maxlength="16" placeholder="Enter your name" autocomplete="off">
+          <button id="btn-join" class="btn btn-secondary">Join Room</button>
+        </div>
+      </div>
+
+      <p id="home-error" class="error-text" hidden></p>
+    </div>
+  </section>
+
+  <!-- ====== WAITING SCREEN ====== -->
+  <section id="screen-waiting" class="screen">
+    <div class="screen-content center-content">
+      <h2 id="waiting-title">Waiting for players…</h2>
+      <div id="room-code-display" class="room-code" hidden>
+        <span class="room-code-label">Room Code</span>
+        <span id="room-code-value" class="room-code-value"></span>
+      </div>
+      <div class="player-counter">
+        <span id="player-count-current">0</span>
+        <span class="counter-slash">/</span>
+        <span id="player-count-total">0</span>
+        <span class="counter-label">players joined</span>
+      </div>
+      <div class="waiting-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== ROLE REVEAL SCREEN ====== -->
+  <section id="screen-role" class="screen">
+    <div class="screen-content center-content">
+      <div class="role-reveal">
+        <p class="role-intro">You are…</p>
+        <div class="role-emoji" id="role-emoji"></div>
+        <h1 class="role-name" id="role-name"></h1>
+        <p class="role-team" id="role-team" hidden></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== NIGHT SCREEN ====== -->
+  <section id="screen-night" class="screen">
+    <div class="screen-content center-content">
+      <div class="night-sky">
+        <div class="moon">🌙</div>
+        <p class="night-text" id="night-text">The night is quiet…</p>
+      </div>
+
+      <div id="night-action-ui" class="action-panel" hidden>
+        <h3 id="night-action-title">Choose your target</h3>
+        <div id="night-player-list" class="player-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== DAY SCREEN ====== -->
+  <section id="screen-day" class="screen">
+    <div class="screen-content center-content">
+      <div class="day-sky">
+        <div class="sun">☀️</div>
+      </div>
+      <div id="day-announcement" class="day-announcement"></div>
+      <div id="discussion-timer" class="timer" hidden>
+        <span class="timer-label">Discussion ends in</span>
+        <span id="timer-value" class="timer-value">60</span>
+        <span class="timer-unit">s</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== VOTE SCREEN ====== -->
+  <section id="screen-vote" class="screen">
+    <div class="screen-content">
+      <h2 class="vote-title">Time to Vote</h2>
+      <p class="vote-subtitle">Who do you think is the Mafia?</p>
+
+      <div id="vote-player-list" class="player-list"></div>
+      <button id="btn-skip-vote" class="btn btn-ghost">Skip Vote</button>
+
+      <div id="vote-waiting" class="vote-waiting" hidden>
+        <p>Vote cast. Waiting for others…</p>
+        <div class="waiting-dots"><span></span><span></span><span></span></div>
+      </div>
+
+      <div id="vote-result-display" class="vote-result" hidden>
+        <p id="vote-result-text" class="vote-result-text"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== GAME OVER SCREEN ====== -->
+  <section id="screen-gameover" class="screen">
+    <div class="screen-content center-content">
+      <h1 class="gameover-title" id="gameover-title"></h1>
+      <p class="gameover-subtitle" id="gameover-subtitle"></p>
+
+      <table class="reveal-table" id="reveal-table">
+        <thead>
+          <tr>
+            <th>Player</th>
+            <th>Role</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="reveal-table-body"></tbody>
+      </table>
+
+      <button id="btn-play-again" class="btn btn-primary" style="margin-top:2rem;">Play Again</button>
+    </div>
+  </section>
+
+  <!-- ====== DEAD OVERLAY ====== -->
+  <div id="dead-overlay" class="dead-overlay" hidden>
+    <div class="dead-content">
+      <span class="dead-icon">☠️</span>
+      <p class="dead-text">You are dead</p>
+      <p class="dead-sub">You can still watch, but you cannot act.</p>
+    </div>
+  </div>
+
+  <!-- ====== INVESTIGATE RESULT TOAST ====== -->
+  <div id="investigate-toast" class="toast" hidden>
+    <p id="investigate-text"></p>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/narrator.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
