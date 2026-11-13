@@ -1,10 +1,18 @@
 /**
- * soundManager.js — Generates cinematic audio & synth SFX in real-time
- * using the Web Audio API. Zero external downloads, zero latency, 100% free.
+ * soundManager.js — Calibrated atmospheric sound effects
+ * Customized with user's curated selection:
+ * 1. Night: Merged Summer Crickets + Low Atmospheric Drone
+ * 2. Murder: Deep Whoosh Riser (/sfx/death-whoosh.mp3)
+ * 3. Elimination: Heavy Trailer Sub Slam (/sfx/gavel-impact.mp3)
+ * 4. Doctor Save: Celestial Harmonic Chord (Synthesized)
+ * 5. Mafia Victory / Town Victory Fanfares
  */
 
 const soundManager = (() => {
   let ctx = null;
+  let cricketsAudio = null;
+  let nightOsc = null;
+  let nightGain = null;
 
   function getCtx() {
     if (!ctx) {
@@ -17,38 +25,84 @@ const soundManager = (() => {
     return ctx;
   }
 
-  // 1. Deep Cinematic Death / Horror Hit ("DUNNNNN")
-  function playDeathHit() {
+  // 1. NIGHT AMBIENCE: Merged Crickets (MP3) + Low Atmospheric Drone (Synth)
+  function startNightAmbience() {
+    // A: Crickets recording
+    if (!cricketsAudio) {
+      cricketsAudio = new Audio('/sfx/night-crickets.mp3');
+      cricketsAudio.loop = true;
+      cricketsAudio.volume = 0.45;
+    }
+    cricketsAudio.currentTime = 0;
+    cricketsAudio.play().catch(() => {});
+
+    // B: Low atmospheric tension drone
     const c = getCtx();
-    if (!c) return;
-    const now = c.currentTime;
+    if (c && !nightOsc) {
+      const now = c.currentTime;
+      nightOsc = c.createOscillator();
+      nightGain = c.createGain();
 
-    // Sub bass drop
-    const osc = c.createOscillator();
-    const gain = c.createGain();
+      nightOsc.type = 'triangle';
+      nightOsc.frequency.setValueAtTime(55, now); // Low A
 
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(110, now);
-    osc.frequency.exponentialRampToValueAtTime(32, now + 1.2);
+      const filter = c.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(140, now);
 
-    gain.gain.setValueAtTime(0.7, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+      nightGain.gain.setValueAtTime(0.001, now);
+      nightGain.gain.linearRampToValueAtTime(0.20, now + 2.0);
 
-    // Low pass filter for dark rumble
-    const filter = c.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(250, now);
-    filter.frequency.exponentialRampToValueAtTime(60, now + 2.0);
+      nightOsc.connect(filter);
+      filter.connect(nightGain);
+      nightGain.connect(c.destination);
 
-    osc.connect(filter);
-    filter.connect(gain);
-    gain.connect(c.destination);
-
-    osc.start(now);
-    osc.stop(now + 2.6);
+      nightOsc.start(now);
+    }
   }
 
-  // 2. Doctor Save / Miracle Chime (Celestial uplifting chord)
+  function stopNightAmbience() {
+    // Fade out crickets
+    if (cricketsAudio) {
+      cricketsAudio.pause();
+      cricketsAudio.currentTime = 0;
+    }
+
+    // Fade out synth drone
+    if (nightGain && nightOsc) {
+      const c = getCtx();
+      if (c) {
+        const now = c.currentTime;
+        nightGain.gain.linearRampToValueAtTime(0.001, now + 1.2);
+        setTimeout(() => {
+          if (nightOsc) {
+            try { nightOsc.stop(); } catch (_) {}
+            nightOsc = null;
+            nightGain = null;
+          }
+        }, 1300);
+      } else {
+        nightOsc = null;
+        nightGain = null;
+      }
+    }
+  }
+
+  // 2. MORNING MURDER HIT: Option C: Deep Whoosh Riser
+  function playDeathHit() {
+    const audio = new Audio('/sfx/death-whoosh.mp3');
+    audio.volume = 0.85;
+    audio.play().catch(() => {});
+  }
+
+  // 3. VOTING ELIMINATION: Option A: Heavy Trailer Sub Slam
+  function playGavelStrike() {
+    const audio = new Audio('/sfx/gavel-impact.mp3');
+    audio.volume = 0.90;
+    audio.play().catch(() => {});
+  }
+
+  // 4. DOCTOR SAVE / MIRACLE: Option B: Celestial Harmonic Chord
   function playMiracleChime() {
     const c = getCtx();
     if (!c) return;
@@ -63,95 +117,18 @@ const soundManager = (() => {
       osc.frequency.setValueAtTime(freq, now + idx * 0.12);
 
       gain.gain.setValueAtTime(0.001, now);
-      gain.gain.setValueAtTime(0.25, now + idx * 0.12);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.12 + 1.8);
+      gain.gain.setValueAtTime(0.30, now + idx * 0.12);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.12 + 2.0);
 
       osc.connect(gain);
       gain.connect(c.destination);
 
       osc.start(now + idx * 0.12);
-      osc.stop(now + idx * 0.12 + 2.0);
+      osc.stop(now + idx * 0.12 + 2.2);
     });
   }
 
-  // 3. Eerie Night Ambient Drone (Subtle low wind & tension)
-  let nightOsc = null;
-  let nightGain = null;
-
-  function startNightAmbience() {
-    const c = getCtx();
-    if (!c || nightOsc) return;
-    const now = c.currentTime;
-
-    nightOsc = c.createOscillator();
-    nightGain = c.createGain();
-
-    nightOsc.type = 'triangle';
-    nightOsc.frequency.setValueAtTime(55, now); // Low A
-
-    const filter = c.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(140, now);
-
-    nightGain.gain.setValueAtTime(0.001, now);
-    nightGain.gain.linearRampToValueAtTime(0.18, now + 2.0);
-
-    nightOsc.connect(filter);
-    filter.connect(nightGain);
-    nightGain.connect(c.destination);
-
-    nightOsc.start(now);
-  }
-
-  function stopNightAmbience() {
-    if (!nightGain || !nightOsc) return;
-    const c = getCtx();
-    if (c) {
-      const now = c.currentTime;
-      nightGain.gain.linearRampToValueAtTime(0.001, now + 1.5);
-      setTimeout(() => {
-        if (nightOsc) {
-          try { nightOsc.stop(); } catch (_) {}
-          nightOsc = null;
-          nightGain = null;
-        }
-      }, 1600);
-    } else {
-      nightOsc = null;
-      nightGain = null;
-    }
-  }
-
-  // 4. Heavy Gavel / Elimination Strike ("SLAM")
-  function playGavelStrike() {
-    const c = getCtx();
-    if (!c) return;
-    const now = c.currentTime;
-
-    // Impact punch
-    const osc = c.createOscillator();
-    const gain = c.createGain();
-
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(160, now);
-    osc.frequency.exponentialRampToValueAtTime(40, now + 0.3);
-
-    gain.gain.setValueAtTime(0.6, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-
-    const filter = c.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(400, now);
-
-    osc.connect(filter);
-    filter.connect(gain);
-    gain.connect(c.destination);
-
-    osc.start(now);
-    osc.stop(now + 0.7);
-  }
-
-  // 5. Mafia Victory (Dark Minor Triumph)
+  // 5. MAFIA VICTORY: Dark Minor Ominous Triumph
   function playMafiaVictory() {
     const c = getCtx();
     if (!c) return;
@@ -165,8 +142,8 @@ const soundManager = (() => {
       osc.type = 'sawtooth';
       osc.frequency.setValueAtTime(freq, now);
 
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 3.0);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 3.2);
 
       const filter = c.createBiquadFilter();
       filter.type = 'lowpass';
@@ -177,11 +154,11 @@ const soundManager = (() => {
       gain.connect(c.destination);
 
       osc.start(now);
-      osc.stop(now + 3.2);
+      osc.stop(now + 3.4);
     });
   }
 
-  // 6. Town Victory (Triumphant Major Fanfare)
+  // 6. TOWN VICTORY: Triumphant Major Fanfare
   function playTownVictory() {
     const c = getCtx();
     if (!c) return;
@@ -200,7 +177,7 @@ const soundManager = (() => {
       osc.type = 'triangle';
       osc.frequency.setValueAtTime(note.f, now + note.t);
 
-      gain.gain.setValueAtTime(0.3, now + note.t);
+      gain.gain.setValueAtTime(0.35, now + note.t);
       gain.gain.exponentialRampToValueAtTime(0.001, now + note.t + note.d);
 
       osc.connect(gain);
@@ -213,11 +190,11 @@ const soundManager = (() => {
 
   return {
     init: getCtx,
-    playDeathHit,
-    playMiracleChime,
     startNightAmbience,
     stopNightAmbience,
+    playDeathHit,
     playGavelStrike,
+    playMiracleChime,
     playMafiaVictory,
     playTownVictory
   };
