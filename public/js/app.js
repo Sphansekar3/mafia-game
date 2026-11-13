@@ -12,7 +12,28 @@
   let myRole = null;
   let isDead = false;
   let roomCode = null;
+  let myName = null;
   let discussionInterval = null;
+
+  // Session persistence helpers
+  function saveSession(code, name, hostStatus) {
+    sessionStorage.setItem('mafia_session', JSON.stringify({ roomCode: code, playerName: name, isHost: hostStatus }));
+    $('#reconnect-bar').hidden = false;
+  }
+
+  function clearSession() {
+    sessionStorage.removeItem('mafia_session');
+    $('#reconnect-bar').hidden = true;
+  }
+
+  function getSavedSession() {
+    try {
+      const raw = sessionStorage.getItem('mafia_session');
+      return raw ? JSON.parse(raw) : null;
+    } catch (_) {
+      return null;
+    }
+  }
 
   // ──── Socket.IO ────
   const socket = io();
@@ -58,6 +79,7 @@
     }
     hideError();
     isHost = true;
+    myName = hostName;
     socket.emit('create-room', { playerCount: count, hostName });
   });
 
@@ -66,16 +88,27 @@
     const hostName = ($('#input-host-name')?.value || 'You').trim();
     hideError();
     isHost = true;
+    myName = hostName;
     socket.emit('create-room', { playerCount: 5, hostName, testBots: true });
   });
 
   $('#btn-join').addEventListener('click', () => {
+    narrator.unlockAudio();
     const code = $('#input-room-code').value.trim().toUpperCase();
     const name = $('#input-player-name').value.trim();
     if (!code) { showError('Enter a room code'); return; }
     if (!name) { showError('Enter your name'); return; }
     hideError();
+    myName = name;
     socket.emit('join-room', { roomCode: code, playerName: name });
+  });
+
+  $('#btn-reconnect')?.addEventListener('click', () => {
+    narrator.unlockAudio();
+    const saved = getSavedSession();
+    if (saved && saved.roomCode && saved.playerName) {
+      socket.emit('reconnect-player', { roomCode: saved.roomCode, playerName: saved.playerName });
+    }
   });
 
   function showError(msg) {
@@ -93,6 +126,7 @@
 
   socket.on('room-created', (data) => {
     roomCode = data.roomCode;
+    saveSession(roomCode, myName, isHost);
     $('#waiting-title').textContent = 'Waiting for players…';
     const codeDisplay = $('#room-code-display');
     codeDisplay.hidden = false;
@@ -101,6 +135,7 @@
   });
 
   socket.on('join-success', () => {
+    saveSession($('#input-room-code').value.trim().toUpperCase(), myName, isHost);
     $('#waiting-title').textContent = 'Joined!';
     $('#room-code-display').hidden = true;
     showScreen('waiting');
@@ -108,6 +143,58 @@
 
   socket.on('join-error', (data) => {
     showError(data.message || 'Could not join room');
+  });
+
+  // ─── Reconnection Handlers ───
+  socket.on('connect', () => {
+    // If we have an active session, auto-reconnect on socket disconnect/reload
+    const saved = getSavedSession();
+    if (saved && saved.roomCode && saved.playerName) {
+      $('#reconnect-bar').hidden = false;
+      socket.emit('reconnect-player', { roomCode: saved.roomCode, playerName: saved.playerName });
+    }
+  });
+
+  socket.on('reconnect-success', (sync) => {
+    console.log('[reconnect] Restored state:', sync);
+    roomCode = sync.roomCode;
+    isHost = sync.isHost;
+    myRole = sync.role;
+    isDead = !sync.alive;
+
+    if (isDead) {
+      $('#dead-overlay').hidden = false;
+    } else {
+      $('#dead-overlay').hidden = true;
+    }
+
+    if (sync.state === 'LOBBY') {
+      $('#waiting-title').textContent = isHost ? 'Waiting for players…' : 'Joined!';
+      $('#player-count-current').textContent = sync.currentCount;
+      $('#player-count-total').textContent = sync.totalPlayers;
+      if (isHost) {
+        $('#room-code-display').hidden = false;
+        $('#room-code-value').textContent = roomCode;
+      }
+      showScreen('waiting');
+    } else if (sync.state === 'NIGHT') {
+      showScreen('night');
+    } else if (sync.state === 'DISCUSSION') {
+      showScreen('day');
+    } else if (sync.state === 'VOTING') {
+      if (!isDead && sync.alivePlayers) {
+        renderVoteList(sync.alivePlayers);
+      }
+      showScreen('vote');
+    } else if (sync.state === 'GAME_OVER') {
+      showScreen('gameover');
+    } else {
+      showScreen('day');
+    }
+  });
+
+  socket.on('reconnect-failed', (_err) => {
+    clearSession();
   });
 
   socket.on('player-count-update', (data) => {
@@ -421,11 +508,13 @@
   // ════════════════════════════════════════════
 
   $('#btn-play-again').addEventListener('click', () => {
+    clearSession();
     // Reset all local state
     isHost = false;
     myRole = null;
     isDead = false;
     roomCode = null;
+    myName = null;
     $('#dead-overlay').hidden = true;
     $('#home-error').hidden = true;
     $('#input-room-code').value = '';

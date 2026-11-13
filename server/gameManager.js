@@ -115,6 +115,51 @@ class Game {
     delete this.players[socketId];
   }
 
+  reconnectPlayer(newSocket, name) {
+    // Find player by name
+    const oldEntry = Object.entries(this.players).find(([_, p]) => p.name.toLowerCase() === name.toLowerCase());
+    if (!oldEntry) return null;
+
+    const [oldSocketId, player] = oldEntry;
+    newSocket.join(this.roomCode);
+
+    // Update socket reference
+    player.socket = newSocket;
+
+    // If socket ID changed, update mapping
+    if (oldSocketId !== newSocket.id) {
+      delete this.players[oldSocketId];
+      this.players[newSocket.id] = player;
+
+      if (this.hostSocketId === oldSocketId) {
+        this.hostSocketId = newSocket.id;
+        player.isHost = true;
+      }
+    }
+
+    return player;
+  }
+
+  getCurrentStateForPlayer(socketId) {
+    const p = this.players[socketId];
+    if (!p) return null;
+
+    const mafiaPlayers = Object.values(this.players).filter(x => x.role === 'mafia').map(x => x.name);
+
+    return {
+      roomCode: this.roomCode,
+      state: this.state,
+      round: this.round,
+      role: p.role,
+      alive: p.alive,
+      isHost: p.isHost,
+      mafiaTeam: p.role === 'mafia' ? mafiaPlayers : null,
+      alivePlayers: this.alivePlayerNames(),
+      currentCount: this.getPlayerCount(),
+      totalPlayers: this.totalPlayers
+    };
+  }
+
   getPlayerCount() {
     return Object.keys(this.players).length;
   }

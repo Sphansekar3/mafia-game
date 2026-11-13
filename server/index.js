@@ -119,6 +119,30 @@ io.on('connection', (socket) => {
     }
   });
 
+  // ─── Reconnect Room ───
+  socket.on('reconnect-player', ({ roomCode, playerName }) => {
+    const code = (roomCode || '').toUpperCase().trim();
+    const name = (playerName || '').trim();
+
+    const game = rooms[code];
+    if (!game) {
+      socket.emit('reconnect-failed', { message: 'Room no longer exists.' });
+      return;
+    }
+
+    const player = game.reconnectPlayer(socket, name);
+    if (!player) {
+      socket.emit('reconnect-failed', { message: 'Player record not found.' });
+      return;
+    }
+
+    socket.data = { roomCode: code, isHost: player.isHost };
+    const syncData = game.getCurrentStateForPlayer(socket.id);
+    socket.emit('reconnect-success', syncData);
+
+    console.log(`[reconnect] ${name} resumed in ${code} (State: ${game.state})`);
+  });
+
   // ─── Night Action (forwarded to game logic) ───
   socket.on('night-action', (payload) => {
     const code = socket.data?.roomCode;
