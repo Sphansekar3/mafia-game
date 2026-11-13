@@ -2,31 +2,157 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sound Test</title>
+  <title>Sound Effects Studio Audition</title>
   <style>
-    body { background: #111; color: #fff; font-family: sans-serif; padding: 30px; text-align: center; }
-    button { padding: 12px 20px; margin: 10px; font-size: 16px; border-radius: 6px; border: none; cursor: pointer; background: #c0392b; color: #fff; }
-    button:hover { background: #e74c3c; }
+    body {
+      background: #0d0d0d;
+      color: #eee;
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 { color: #e74c3c; margin-bottom: 6px; }
+    p.sub { color: #888; margin-bottom: 25px; text-align: center; max-width: 600px; }
+    .section-title {
+      width: 100%;
+      max-width: 680px;
+      color: #3498db;
+      font-size: 1.15rem;
+      font-weight: bold;
+      border-bottom: 1px solid #333;
+      padding-bottom: 6px;
+      margin-top: 20px;
+      margin-bottom: 15px;
+    }
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+      width: 100%;
+      max-width: 680px;
+      margin-bottom: 10px;
+    }
+    .card {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .card:hover { border-color: #e74c3c; }
+    .card-head { display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+    .tag { font-size: 0.75rem; padding: 2px 8px; background: #2c3e50; border-radius: 4px; color: #3498db; }
+    .desc { font-size: 0.85rem; color: #aaa; }
+    button.play-btn {
+      background: #c0392b;
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    button.play-btn:hover { background: #e74c3c; }
+    button.stop-btn { background: #555; }
+    button.stop-btn:hover { background: #777; }
+    .back { margin-top: 40px; color: #e74c3c; text-decoration: none; font-size: 0.95rem; }
   </style>
 </head>
 <body>
-  <h1>🔊 Sound Effects Test Page</h1>
-  <p>Click any button below to test the sound effects directly in your browser:</p>
-  
-  <div>
-    <button onclick="soundManager.init(); soundManager.startNightAmbience()">🌙 Start Night Ambience</button>
-    <button onclick="soundManager.stopNightAmbience()">⏹️ Stop Night Ambience</button>
-  </div>
-  <div>
-    <button onclick="soundManager.init(); soundManager.playDeathHit()">🩸 Test Death Bass Hit ("DUNNN")</button>
-    <button onclick="soundManager.init(); soundManager.playMiracleChime()">✨ Test Miracle Chime</button>
-  </div>
-  <div>
-    <button onclick="soundManager.init(); soundManager.playGavelStrike()">⚖️ Test Gavel Strike</button>
-    <button onclick="soundManager.init(); soundManager.playMafiaVictory()">🔪 Test Mafia Win Sound</button>
-    <button onclick="soundManager.init(); soundManager.playTownVictory()">🏘️ Test Town Win Sound</button>
+
+  <h1>🎧 Sound Effects Studio Audition</h1>
+  <p class="sub">Listen to each sound option below and compare real studio recordings with the previous synthesizer versions.</p>
+
+  <!-- 1. NIGHT AMBIENCE -->
+  <div class="section-title">🌙 1. Night Falls Ambience</div>
+  <div class="options-grid">
+    <div class="card">
+      <div class="card-head">Option A: Natural Summer Night Crickets <span class="tag">Studio Audio</span></div>
+      <div class="desc">High-quality real recording of calm night crickets and gentle forest breeze.</div>
+      <button class="play-btn" onclick="playAudio('/sfx/night-crickets.mp3', true)">▶ Play Crickets (Loop)</button>
+      <button class="play-btn stop-btn" onclick="stopAudio()">⏹ Stop</button>
+    </div>
+    <div class="card">
+      <div class="card-head">Option B: Low Atmospheric Drone <span class="tag">Dark Horror Synth</span></div>
+      <div class="desc">Eerie, low-frequency suspense hum that builds subtle psychological tension.</div>
+      <button class="play-btn" onclick="soundManager.init(); soundManager.startNightAmbience()">▶ Play Drone</button>
+      <button class="play-btn stop-btn" onclick="soundManager.stopNightAmbience()">⏹ Stop</button>
+    </div>
   </div>
 
-  <script src="js/soundManager.js"></script>
+  <!-- 2. DEATH ANNOUNCEMENT -->
+  <div class="section-title">🩸 2. Morning Murder Hit</div>
+  <div class="options-grid">
+    <div class="card">
+      <div class="card-head">Option A: Hard Horror Jump Scare Hit <span class="tag">Studio Audio</span></div>
+      <div class="desc">Terrifying high-impact sting followed by a deep sub-rumble.</div>
+      <button class="play-btn" onclick="playAudio('/sfx/death-horror.mp3')">▶ Play Horror Hit</button>
+    </div>
+    <div class="card">
+      <div class="card-head">Option B: Movie Trailer Epic Bass Drop <span class="tag">Studio Audio</span></div>
+      <div class="desc">Massive cinematic whoosh impact ("BOOM") used in action thriller movie trailers.</div>
+      <button class="play-btn" onclick="playAudio('/sfx/death-cinematic.mp3')">▶ Play Epic Impact</button>
+    </div>
+    <div class="card">
+      <div class="card-head">Option C: Deep Whoosh Riser <span class="tag">Studio Audio</span></div>
+      <div class="desc">Dark shadowy whoosh sweep into a muffled sub-bass strike.</div>
+      <button class="play-btn" onclick="playAudio('/sfx/death-whoosh.mp3')">▶ Play Whoosh Hit</button>
+    </div>
+  </div>
+
+  <!-- 3. VOTING ELIMINATION -->
+  <div class="section-title">⚖️ 3. Voting Elimination</div>
+  <div class="options-grid">
+    <div class="card">
+      <div class="card-head">Option A: Heavy Trailer Sub Slam <span class="tag">Studio Audio</span></div>
+      <div class="desc">Dramatic cinematic slam as if a heavy iron gate or sentence just dropped.</div>
+      <button class="play-btn" onclick="playAudio('/sfx/gavel-impact.mp3')">▶ Play Heavy Slam</button>
+    </div>
+    <div class="card">
+      <div class="card-head">Option B: Clean Quick Impact <span class="tag">Studio Audio</span></div>
+      <div class="desc">Short, decisive gavel / punch sound effect.</div>
+      <button class="play-btn" onclick="playAudio('/sfx/gavel-slam.mp3')">▶ Play Clean Hit</button>
+    </div>
+  </div>
+
+  <!-- 4. DOCTOR SAVE -->
+  <div class="section-title">✨ 4. Doctor Save / Miracle</div>
+  <div class="options-grid">
+    <div class="card">
+      <div class="card-head">Option A: Crystal Wind Chime <span class="tag">Studio Audio</span></div>
+      <div class="desc">Magical, shimmering chime indicating life was preserved.</div>
+      <button class="play-btn" onclick="playAudio('/sfx/miracle-chime.mp3')">▶ Play Crystal Chime</button>
+    </div>
+    <div class="card">
+      <div class="card-head">Option B: Celestial Harmonic Chord <span class="tag">Synthesizer</span></div>
+      <div class="desc">Peaceful major arpeggio sigh of relief.</div>
+      <button class="play-btn" onclick="soundManager.init(); soundManager.playMiracleChime()">▶ Play Harmonic Chord</button>
+    </div>
+  </div>
+
+  <a href="/" class="back">← Back to Mafia Lobby</a>
+
+  <script src="/js/soundManager.js"></script>
+  <script>
+    let activeAudio = null;
+    function playAudio(url, loop = false) {
+      stopAudio();
+      activeAudio = new Audio(url);
+      activeAudio.loop = loop;
+      activeAudio.play();
+    }
+    function stopAudio() {
+      if (activeAudio) {
+        activeAudio.pause();
+        activeAudio.currentTime = 0;
+        activeAudio = null;
+      }
+    }
+  </script>
 </body>
 </html>
