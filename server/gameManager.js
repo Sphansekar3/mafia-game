@@ -327,12 +327,13 @@ class Game {
     this.doctorTarget = null;
     this.detectiveTarget = null;
 
-    // 1. Narrate night falls
-    await this.narrate(narration.nightRound(this.round));
-
-    // 2. phase-night to all clients
+    // 1. phase-night to all clients immediately so screens turn dark & night sound starts
     this.io.to(this.roomCode).emit('phase-night', { round: this.round });
-    await pause(2000);
+    await pause(1000);
+
+    // 2. Narrate night falls
+    await this.narrate(narration.nightRound(this.round));
+    await pause(1500);
 
     // ─── Mafia turn ───
     await this.narrate(narration.mafiaWake);
