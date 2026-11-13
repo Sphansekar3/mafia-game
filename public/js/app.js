@@ -67,6 +67,7 @@
 
   $('#btn-create').addEventListener('click', () => {
     narrator.unlockAudio();
+    if (typeof soundManager !== 'undefined') soundManager.init();
     const hostName = ($('#input-host-name')?.value || '').trim();
     if (!hostName) {
       showError('Please enter your name');
@@ -85,6 +86,7 @@
 
   $('#btn-test-bots').addEventListener('click', () => {
     narrator.unlockAudio();
+    if (typeof soundManager !== 'undefined') soundManager.init();
     const hostName = ($('#input-host-name')?.value || 'You').trim();
     hideError();
     isHost = true;
@@ -94,6 +96,7 @@
 
   $('#btn-join').addEventListener('click', () => {
     narrator.unlockAudio();
+    if (typeof soundManager !== 'undefined') soundManager.init();
     const code = $('#input-room-code').value.trim().toUpperCase();
     const name = $('#input-player-name').value.trim();
     if (!code) { showError('Enter a room code'); return; }
