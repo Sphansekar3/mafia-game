@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sound Test</title>
+  <style>
+    body { background: #111; color: #fff; font-family: sans-serif; padding: 30px; text-align: center; }
+    button { padding: 12px 20px; margin: 10px; font-size: 16px; border-radius: 6px; border: none; cursor: pointer; background: #c0392b; color: #fff; }
+    button:hover { background: #e74c3c; }
+  </style>
+</head>
+<body>
+  <h1>🔊 Sound Effects Test Page</h1>
+  <p>Click any button below to test the sound effects directly in your browser:</p>
+  
+  <div>
+    <button onclick="soundManager.init(); soundManager.startNightAmbience()">🌙 Start Night Ambience</button>
+    <button onclick="soundManager.stopNightAmbience()">⏹️ Stop Night Ambience</button>
+  </div>
+  <div>
+    <button onclick="soundManager.init(); soundManager.playDeathHit()">🩸 Test Death Bass Hit ("DUNNN")</button>
+    <button onclick="soundManager.init(); soundManager.playMiracleChime()">✨ Test Miracle Chime</button>
+  </div>
+  <div>
+    <button onclick="soundManager.init(); soundManager.playGavelStrike()">⚖️ Test Gavel Strike</button>
+    <button onclick="soundManager.init(); soundManager.playMafiaVictory()">🔪 Test Mafia Win Sound</button>
+    <button onclick="soundManager.init(); soundManager.playTownVictory()">🏘️ Test Town Win Sound</button>
+  </div>
+
+  <script src="js/soundManager.js"></script>
+</body>
+</html>
