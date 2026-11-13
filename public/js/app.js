@@ -259,6 +259,11 @@
     $('#night-player-list').innerHTML = '';
     $('#night-text').textContent = 'The night is quiet…';
     showScreen('night');
+
+    // Atmospheric night ambient drone on host device
+    if (isHost && typeof soundManager !== 'undefined') {
+      soundManager.startNightAmbience();
+    }
   });
 
   socket.on('your-turn', (data) => {
@@ -323,16 +328,24 @@
   // ════════════════════════════════════════════
 
   socket.on('phase-day', (data) => {
+    // Stop night ambience on sunrise
+    if (isHost && typeof soundManager !== 'undefined') {
+      soundManager.stopNightAmbience();
+    }
+
     const ann = $('#day-announcement');
 
     if (data.killed) {
       if (data.saved) {
         ann.innerHTML = `<span class="saved-text">It's a miracle!</span> No one died last night. The doctor saved a life!`;
+        if (isHost && typeof soundManager !== 'undefined') soundManager.playMiracleChime();
       } else {
         ann.innerHTML = `<span class="death-name">${data.killed}</span> was found dead this morning.<br>They were a <strong>${data.killedRole}</strong>.`;
+        if (isHost && typeof soundManager !== 'undefined') soundManager.playDeathHit();
       }
     } else {
       ann.innerHTML = `<span class="saved-text">It's a miracle!</span> No one died last night!`;
+      if (isHost && typeof soundManager !== 'undefined') soundManager.playMiracleChime();
     }
 
     // If killed is null, no one targeted / miracle
@@ -437,6 +450,9 @@
 
     if (data.eliminated) {
       textEl.innerHTML = `<span style="color:#c0392b;font-weight:700">${data.eliminated}</span> has been eliminated!<br>They were a <strong>${data.role}</strong>.`;
+      if (isHost && typeof soundManager !== 'undefined') {
+        soundManager.playGavelStrike();
+      }
     } else {
       textEl.innerHTML = 'The town could not reach a decision.<br>No one is eliminated.';
     }
@@ -471,10 +487,12 @@
       titleEl.textContent = '🔪 MAFIA WINS';
       titleEl.className = 'gameover-title mafia-wins';
       subEl.textContent = 'The town has fallen to darkness.';
+      if (isHost && typeof soundManager !== 'undefined') soundManager.playMafiaVictory();
     } else {
       titleEl.textContent = '🏘️ TOWN WINS';
       titleEl.className = 'gameover-title town-wins';
       subEl.textContent = 'Justice has prevailed!';
+      if (isHost && typeof soundManager !== 'undefined') soundManager.playTownVictory();
     }
 
     // Build reveal table
